@@ -48,37 +48,59 @@ function buyItem(){
     ]).then(function(response){
         choice = response.id;
         amount = response.quant;
-        connection.query("select * from products where ?",
-            {
-                item_id: choice
-            }
-        ),function(err, newRes){
-            if (err) throw err;
-            if(amount < newRes.stock_quantity){
-                console.log("Insufficient quantity!");
-                buyItem();
-            }else{
-                console.log(`You have bought ${amount} of ${newRes.product_name}!`);
-                updateItem(choice, amount);
-            }
+        updateItems(choice, amount);
+    });
+}
+
+function updateItems(choice, amount){
+    connection.query("select * from products where ?",
+    {
+        item_id: `${choice}`
+    },function(err, newRes){
+        if (err) throw err;
+        var buy;
+        for (var i = 0; i < newRes.length; i++){
+            buy = newRes[i];
+        }
+        // console.log(`${choice}, ${amount}, ${buy}`);
+        if(amount > buy.stock_quantity){
+            console.log("Insufficient quantity!");
+            buyItem();
+        }else{
+            console.log(`You have bought ${amount} units of ${buy.product_name}!\nThat will be $${amount * buy.price}`);
+            connection.query(
+                "update products set ? where ?",
+                [
+                    {
+                        stock_quantity: (buy.stock_quantity - amount)
+                    },
+                    {
+                        item_id: choice
+                    }
+                ], function(err, resp){
+                    if (err) throw err;
+                    console.log(`Stock updated! ${resp.affectedRows} products updated`);
+                    keepBuying();
+                }
+            );
         }
     });
 }
 
-function updateItem(choice, amount){
-    connection.query(
-        "update products set ? where ?",
-        [
-            {
-                stock_quantity: amount
-            },
-            {
-                item_id: choice
-            }
-        ], function(err, resp){
-            if (err) throw err;
-            console.log(`Stock updated! ${resp.affectedRows} products updated`);
+function keepBuying(){
+    inquirer.prompt([
+        {
+            type: "confirm",
+            message: "Would you like to keep shopping?",
+            name: "shop",
+            default: true
+        }
+    ]).then(function(response){
+        if(response.shop === true){
+            showItems();
+        }else{
+            console.log("Thank you for shopping at Bamazon!");
             connection.end();
         }
-    );
+    })
 }
