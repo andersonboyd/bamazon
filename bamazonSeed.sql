@@ -20,5 +20,5 @@ insert into products (product_name, department_name, price, stock_quantity) valu
 ("Canned peaches", "food", 3.50, 1000),
 ("Soy candle", "home goods", 15.99, 750),
 ("Battlefield V", "video games", 59.99, 350),
-("Can of Cafe du Monde coffee", "food", 6.50, 500),
+("Gourmet coffee", "food", 6.50, 500),
 ("Washer/dryer set", "home goods", 999.99, 200);

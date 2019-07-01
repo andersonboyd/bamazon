@@ -2,6 +2,7 @@ require("dotenv").config();
 
 var mysql = require("mysql");
 var inquirer = require("inquirer");
+var Table = require("cli-table");
 var choice;
 var amount;
 
@@ -23,12 +24,19 @@ function showItems(){
     connection.query("select * from products", function(err, res){
         if (err) throw err;
         var products;
-        console.log(`Item ID | Products | Department | Price | Quantity in stock   
-============================================================\n`);
+        var table = new Table({
+            head: [`Item ID`, `Products`, `Department`, `Price`, `Quantity in stock`],
+            colWidths: [10, 20, 20, 20, 20]
+        });
         for(var i = 0; i < res.length; i++){
             products = res[i];
-            console.log(`${products.item_id} | ${products.product_name} | ${products.department_name} | $${products.price} | ${products.stock_quantity}`);
+            table.push([`${products.item_id}`,
+            `${products.product_name}`,
+            `${products.department_name}`,
+            `$${products.price}`,
+            `${products.stock_quantity}`]);
         }
+        console.log(table.toString());
         buyItem();
     });
 }
