@@ -6,8 +6,8 @@ create table products(
 	item_id int not null auto_increment,
     product_name varchar(50) not null,
     department_name varchar(50) not null,
-    price decimal(65,2),
-    stock_quantity integer(255),
+    price decimal(3,2),
+    stock_quantity integer(4),
     primary key (item_id)
 );
 
